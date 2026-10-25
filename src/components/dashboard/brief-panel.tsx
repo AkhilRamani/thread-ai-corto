@@ -1,6 +1,8 @@
 import Image from "next/image";
 import wave from "../../../public/images/brief-wave.webp";
-import { sourceLabel, type SourceItem, type WorkBrief } from "@/lib/contracts";
+import { type SourceItem, type WorkBrief } from "@/lib/contracts";
+
+import { SourceReferences } from "./source-references";
 
 type BriefPanelProps = {
   brief: WorkBrief;
@@ -13,34 +15,34 @@ export function BriefPanel({
   sources,
   onSourceSelect,
 }: BriefPanelProps) {
-  const references = sources.filter((source) =>
-    brief.sourceIds.includes(source.id),
-  );
   return (
-    <section className="brief-panel" aria-label="Your work brief">
+    <section
+      className="relative isolate grid min-h-[380px] items-center overflow-hidden rounded-panel bg-[#5259dc] px-10 pt-[120px] pb-[72px] text-white max-[600px]:min-h-[360px] max-[600px]:px-6 max-[600px]:py-16"
+      aria-label="Your work brief"
+    >
       <Image
-        className="brief-wave"
+        className="-z-2 object-cover max-[600px]:object-fill"
         src={wave}
         alt=""
         fill
         priority
         sizes="(max-width: 904px) 100vw, 860px"
       />
-      <div className="brief-scrim" aria-hidden="true" />
-      <div className="brief-content">
-        <p className="brief-overview">{brief.overview}</p>
-        <div className="brief-references" aria-label="Sources for this brief">
-          {references.map((source) => (
-            <button
-              className="citation"
-              key={source.id}
-              onClick={() => onSourceSelect(source.id)}
-              aria-label={`View source ${sourceLabel(source)}`}
-            >
-              {sourceLabel(source)}
-            </button>
-          ))}
-        </div>
+      <div
+        className="absolute inset-0 -z-1 bg-brief-scrim"
+        aria-hidden="true"
+      />
+      <div className="mx-auto w-full max-w-[560px] text-center">
+        <p className="text-[22px] leading-8 tracking-[-0.02em] text-pretty max-[600px]:text-[18px] max-[600px]:leading-7">
+          {brief.overview}
+        </p>
+        <SourceReferences
+          sourceIds={brief.sourceIds}
+          sources={sources}
+          onSourceSelect={onSourceSelect}
+          variant="panel"
+          label="Sources for this brief"
+        />
       </div>
     </section>
   );

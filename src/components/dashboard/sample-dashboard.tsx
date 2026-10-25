@@ -7,6 +7,7 @@ import { BriefPanel } from "./brief-panel";
 import { BriefPlaceholder } from "./brief-placeholder";
 import { SampleControls } from "./sample-controls";
 import { SiteHeader } from "./site-header";
+import { SourceReferences } from "./source-references";
 import { SourceList } from "./source-list";
 import { useSampleDashboard } from "./use-sample-dashboard";
 
@@ -90,16 +91,26 @@ export function SampleDashboard() {
 
   return (
     <>
-      <a className="skip-link" href="#main">
+      <a
+        className="fixed top-[-100px] left-4 z-10 rounded-3xl bg-black px-5 py-3 text-white focus:top-3"
+        href="#main"
+      >
         Skip to content
       </a>
       <SiteHeader />
-      <main className="dashboard" id="main">
-        <div className="page-intro">
-          <p className="eyebrow">
+      <main
+        className="mx-auto w-full max-w-[904px] px-[22px] pt-12 pb-10 max-[600px]:px-5 max-[600px]:pb-8"
+        id="main"
+      >
+        <div className="mb-8">
+          <p className="mb-8 flex items-center gap-2.5 font-mono text-[12px] leading-[18px] font-normal tracking-normal text-muted-foreground uppercase max-[600px]:mb-6 max-[600px]:gap-2 max-[600px]:text-[10px]">
             Your GitHub brief <span aria-hidden="true">·</span> Sample data
           </p>
-          <h1 ref={headingRef} tabIndex={-1}>
+          <h1
+            className="scroll-mt-8 text-[clamp(30px,3.1vw,40px)] leading-[1.2] tracking-[-0.03em] text-balance focus:not-focus-visible:outline-none max-[600px]:text-[32px]"
+            ref={headingRef}
+            tabIndex={-1}
+          >
             {title}
           </h1>
         </div>
@@ -144,21 +155,39 @@ export function SampleDashboard() {
           />
         )}
         {state.brief?.observations.length ? (
-          <div className="brief-observations">
+          <div className="mt-8 grid gap-6">
             {state.brief.observations.map((observation, index) => (
-              <p key={index}>{observation.text}</p>
+              <div key={index}>
+                <p>{observation.text}</p>
+                <SourceReferences
+                  sourceIds={observation.sourceIds}
+                  sources={state.snapshot.items}
+                  onSourceSelect={revealSource}
+                  label={`Sources for observation ${index + 1}`}
+                />
+              </div>
             ))}
           </div>
         ) : null}
-        <div className="brief-followup">
+        <div className="mt-12 max-[600px]:mt-8">
           {state.brief?.nextStep && (
-            <div className="next-step">
-              <h2 className="eyebrow">Suggested next step</h2>
-              <p>{state.brief.nextStep}</p>
+            <div>
+              <h2 className="mb-3 font-mono text-[12px] leading-[18px] font-normal tracking-normal text-muted-foreground uppercase">
+                Suggested next step
+              </h2>
+              <p className="max-w-[720px] text-pretty">
+                {state.brief.nextStep.text}
+              </p>
+              <SourceReferences
+                sourceIds={state.brief.nextStep.sourceIds}
+                sources={state.snapshot.items}
+                onSourceSelect={revealSource}
+                label="Sources for the suggested next step"
+              />
             </div>
           )}
           {!state.sourceError && !sourcesLoading && (
-            <div className="brief-actions">
+            <div className="mt-7 flex flex-wrap items-center gap-3 first:mt-0">
               <Button
                 disabled={generating}
                 onClick={() => {
@@ -185,7 +214,7 @@ export function SampleDashboard() {
             </div>
           )}
           {copyStatus && (
-            <p className="copy-status" role="status">
+            <p className="mt-4 text-[14px] text-muted-foreground" role="status">
               {copyStatus}
             </p>
           )}

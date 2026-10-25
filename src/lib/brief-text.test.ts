@@ -17,9 +17,31 @@ describe("brief copy", () => {
       ...source,
       url: `https://github.com/example/atlas/issues/${source.number}`,
     }));
-    const text = briefToText({ ...sampleBrief, sourceIds: ["pr-142"] }, items);
+    const text = briefToText(
+      { ...sampleBrief, sourceIds: ["pr-142"], nextStep: undefined },
+      items,
+    );
     expect(text).toContain(items[0].url);
     expect(text).not.toContain(items[1].url);
     expect(text).not.toContain("sample");
+  });
+  it("includes evidence used only by an observation or next step, once per source", () => {
+    const text = briefToText(
+      {
+        ...sampleBrief,
+        sourceIds: [],
+        observations: [{ text: "An observation", sourceIds: ["pr-142"] }],
+        nextStep: {
+          text: "Check the expiry issue.",
+          sourceIds: ["issue-138", "pr-142", "missing"],
+        },
+      },
+      sampleSnapshot.items,
+    );
+    expect(text).toContain("An observation");
+    expect(text).toContain("Suggested next step: Check the expiry issue.");
+    expect(text.match(/atlas #142/g)).toHaveLength(1);
+    expect(text.match(/atlas #138/g)).toHaveLength(1);
+    expect(text).not.toContain("missing");
   });
 });

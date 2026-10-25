@@ -8,13 +8,14 @@ export function briefToText(
   const referencedIds = new Set([
     ...brief.sourceIds,
     ...brief.observations.flatMap((observation) => observation.sourceIds),
+    ...(brief.nextStep?.sourceIds ?? []),
   ]);
   return [
     ...(sample ? ["MySubscriptions · illustrative sample"] : []),
     brief.title,
     brief.overview,
     ...brief.observations.map((observation) => observation.text),
-    ...(brief.nextStep ? [`Suggested next step: ${brief.nextStep}`] : []),
+    ...(brief.nextStep ? [`Suggested next step: ${brief.nextStep.text}`] : []),
     "Sources:",
     ...sources
       .filter((source) => referencedIds.has(source.id))

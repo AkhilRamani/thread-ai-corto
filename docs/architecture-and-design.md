@@ -6,7 +6,7 @@ MySubscriptions helps developers pick up where they left off. It connects to Git
 
 The value is reconstructing context across related work. Every insight links to its sources so the user can inspect the evidence and act in GitHub. Activity counts are not treated as productivity measures.
 
-This document defines the initial product and system. The [take-home assignment](../MySubscriptions_TakeHome.md) defines the submission requirements.
+This document defines the agreed product and system. The interface, sample flow, GitHub OAuth, and public source retrieval are implemented. Live AI generation and hosted verification remain to be completed. The [take-home assignment](../MySubscriptions_TakeHome.md) defines the submission requirements.
 
 ## Requirements and scope
 
@@ -31,7 +31,7 @@ The first version supports one service and public, read-only data. Private repos
 | AI | OpenAI Responses API and official JavaScript SDK |
 | Model | GPT-6 Luna, configured as `OPENAI_MODEL=gpt-6-luna` |
 | Validation | Zod |
-| Testing | Vitest and Playwright |
+| Testing | Vitest, React Testing Library, and manual browser verification |
 | Hosting | Vercel, Node.js runtime |
 | Tooling | pnpm, committed lockfile, ESLint, TypeScript checks |
 | Persistence | No application database |
@@ -87,7 +87,7 @@ The brief contains:
 - A short overview of the work.
 - Up to three observations connecting related items or surfacing open threads.
 - One suggested starting point with a reason, when evidence supports it.
-- Source references for substantive claims.
+- Source references for the overview, each observation, and the suggested starting point.
 
 Application code supplies facts and coverage; the model interprets the available text. Zod validates the output, and the server checks source references against the snapshot. Links come from GitHub data rather than model-generated URLs.
 
@@ -113,7 +113,7 @@ The sample reuses the dashboard with fixed data and a prerecorded brief. It is v
 
 ### Visual design
 
-The visual reference is [Design Systems Surf](https://designsystems.surf/), including its library, footer, and the supplied wave panel. The selected layout leads with the insight. A spacious blue, lavender, peach, and yellow wave panel holds the brief; the next step, controls, and source list sit on white below. Match the reference's Inter Display headings, Inter body text, IBM Plex Mono labels, black pill buttons with white labels, and generous spacing. Colour stays within the brief panel. The measured values and application mapping are recorded in [the visual foundation](design/visual-foundation.md). shadcn/ui supplies shared controls styled through common theme tokens. Desktop and mobile preserve the same content hierarchy; a permanent sidebar is unnecessary. Visual checks cover spacing, typography, contrast, and responsive wrapping.
+The visual reference is [Design Systems Surf](https://designsystems.surf/), including its library, footer, and the supplied wave panel. The selected layout leads with the insight. A spacious blue, lavender, peach, and yellow wave panel holds the brief; the next step, controls, and source list sit on white below. Match the reference's Inter Display headings, Inter body text, IBM Plex Mono labels, black pill buttons with white labels, and generous spacing. Colour is concentrated in the brief panel and small source-kind tiles. The measured values and application mapping are recorded in [the visual foundation](design/visual-foundation.md). shadcn/ui supplies shared controls styled through common theme tokens. Desktop and mobile preserve the same content hierarchy; a permanent sidebar is unnecessary. Visual checks cover spacing, typography, contrast, and responsive wrapping.
 
 Delight comes from immediate context, clear evidence, useful copy, and fast navigation back to GitHub. Controls support keyboard use, visible focus, accessible status messages, and reduced motion. Colour is never the only status indicator.
 
@@ -132,9 +132,9 @@ Delight comes from immediate context, clear evidence, useful copy, and fast navi
 
 Authentication and same-origin checks protect server operations. Cookies use secure production settings. Secrets and source content stay out of logs, and user responses are not placed in shared caches.
 
-Generation has bounded input, output, and request duration, with hosting-level rate limiting. There is no anonymous live generation. Selected public data is sent to OpenAI only on request, with response storage disabled; this does not imply zero provider retention.
+The planned generation endpoint will bound input, output, and request duration, with hosting-level rate limiting configured before public deployment. There is no anonymous live generation. Selected public data is sent to OpenAI only on request, with response storage disabled; this does not imply zero provider retention.
 
-Focused tests cover the OAuth callback and session boundaries, data normalization, partial results, source validation, and the main dashboard flow. Live OAuth and model integration are verified on the hosted application. AI evaluation uses related, unrelated, sparse, and adversarial sample descriptions to assess grounding and usefulness.
+Focused tests cover the OAuth callback and session boundaries, data normalization, partial results, source validation, and the main dashboard flow. Local browser checks have covered GitHub sign-in, source retrieval, refresh, and source links. Hosted verification remains pending. The AI step will add evaluation with related, unrelated, sparse, and adversarial descriptions to assess grounding and usefulness.
 
 The database-free design keeps deployment small. It deliberately excludes durable quotas, saved briefs, and cross-device history.
 

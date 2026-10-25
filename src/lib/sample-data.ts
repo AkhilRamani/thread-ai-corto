@@ -36,7 +36,10 @@ export const sampleBrief: WorkBrief = {
     "The password reset flow is still open. An assigned issue describes expired recovery links. Both point back to account recovery.",
   sourceIds: ["pr-142", "issue-138"],
   observations: [],
-  nextStep: "Check whether the PR description addresses the expiry issue.",
+  nextStep: {
+    text: "Check whether the PR description addresses the expiry issue.",
+    sourceIds: ["pr-142", "issue-138"],
+  },
 };
 
 export const partialBrief: WorkBrief = {
