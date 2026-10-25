@@ -76,7 +76,7 @@ function stateForScenario(scenario: SampleScenario): DashboardState {
 }
 
 // Only this controller simulates latency. Presentational components know nothing
-// about fixtures or providers; the next slice can supply real request results.
+// about fixtures or providers; the live controller supplies real request results.
 export function useSampleDashboard() {
   const [state, setState] = useState(() => stateForScenario("ready"));
   const [scenario, setScenario] = useState<SampleScenario>("ready");

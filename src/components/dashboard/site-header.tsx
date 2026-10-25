@@ -10,7 +10,7 @@ export function SiteHeader({
   mode?: "sample" | "live" | "entry";
 }) {
   return (
-    <header className="flex h-[68px] items-center justify-between gap-6 border-b px-8 max-[600px]:gap-3 max-[600px]:px-5">
+    <header className="sticky top-0 z-10 flex h-[68px] items-center justify-between gap-6 border-b bg-background px-8 max-[600px]:gap-3 max-[600px]:px-5">
       <Link
         className="text-[20px] font-medium tracking-[-0.04em] no-underline max-[600px]:text-[18px]"
         href="/"
@@ -21,7 +21,15 @@ export function SiteHeader({
       <div className="flex items-center gap-5 max-[600px]:gap-2">
         {user ? (
           <>
-            <span className="max-w-40 overflow-hidden text-ellipsis text-[14px] max-[600px]:max-w-[90px] max-[600px]:text-[12px]">
+            <Button
+              className="max-[600px]:px-3 max-[600px]:text-[12px]"
+              variant="ghost"
+              size="sm"
+              asChild
+            >
+              <Link href="/sample">Sample</Link>
+            </Button>
+            <span className="max-w-40 overflow-hidden text-ellipsis text-[14px] max-[600px]:hidden">
               {user.login}
             </span>
             <form action="/api/auth/logout" method="post">

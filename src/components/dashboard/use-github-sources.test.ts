@@ -154,3 +154,168 @@ it("rechecks a restored page's session even during a cooldown", async () => {
   expect(result.current.state.retryAt).toBeNull();
   unmount();
 });
+
+const brief = {
+  title: "A work thread",
+  overview: "Useful source-backed context.",
+  sourceIds: ["real-source"],
+  observations: [],
+  nextStep: null,
+};
+
+it("generates only on demand and atomically replaces the snapshot and brief", async () => {
+  const fresh = {
+    ...snapshot,
+    fetchedAt: "2026-10-25T01:00:00Z",
+    items: [{ id: "fresh-source" }],
+  };
+  fetchMock
+    .mockResolvedValueOnce(Response.json({ snapshot }))
+    .mockResolvedValueOnce(
+      Response.json({
+        snapshot: fresh,
+        brief: { ...brief, sourceIds: ["fresh-source"] },
+      }),
+    );
+  const { result, unmount } = renderHook(() => useGitHubSources());
+  await waitFor(() => expect(result.current.state.loading).toBe(false));
+  expect(fetchMock).toHaveBeenCalledTimes(1);
+  expect(result.current.state.brief).toBeNull();
+  await act(async () => {
+    await result.current.generate();
+  });
+  expect(fetchMock.mock.calls[1][0]).toBe("/api/brief");
+  expect(fetchMock.mock.calls[1][1]?.body).toBeUndefined();
+  expect(result.current.state.snapshot).toEqual(fresh);
+  expect(result.current.state.brief?.sourceIds).toEqual(["fresh-source"]);
+  unmount();
+});
+
+it("deduplicates generation clicks and discards a generation superseded by refresh", async () => {
+  let finish!: (response: Response) => void;
+  fetchMock
+    .mockResolvedValueOnce(Response.json({ snapshot }))
+    .mockImplementationOnce(
+      () =>
+        new Promise((resolve) => {
+          finish = resolve;
+        }),
+    )
+    .mockResolvedValueOnce(
+      Response.json({ snapshot: { ...snapshot, items: [] } }),
+    );
+  const { result, unmount } = renderHook(() => useGitHubSources());
+  await waitFor(() => expect(result.current.state.loading).toBe(false));
+  act(() => {
+    void result.current.generate();
+    void result.current.generate();
+  });
+  expect(fetchMock).toHaveBeenCalledTimes(2);
+  expect(result.current.state.generating).toBe(true);
+  await act(async () => {
+    await result.current.refresh();
+  });
+  expect(fetchMock.mock.calls[1][1]?.signal?.aborted).toBe(true);
+  await act(async () => {
+    finish(Response.json({ snapshot, brief }));
+  });
+  expect(result.current.state.brief).toBeNull();
+  expect(result.current.state.snapshot.items).toHaveLength(0);
+  unmount();
+});
+
+it.each([false, true])(
+  "keeps usable sources on AI failure, using fresh sources when available (%s)",
+  async (fresh) => {
+    const updated = { ...snapshot, fetchedAt: "2026-10-25T01:00:00Z" };
+    fetchMock
+      .mockResolvedValueOnce(Response.json({ snapshot }))
+      .mockResolvedValueOnce(
+        Response.json(
+          {
+            error: "unavailable",
+            stage: "brief",
+            message: "Try again.",
+            ...(fresh ? { snapshot: updated } : {}),
+          },
+          { status: 503 },
+        ),
+      );
+    const { result, unmount } = renderHook(() => useGitHubSources());
+    await waitFor(() => expect(result.current.state.loading).toBe(false));
+    await act(async () => {
+      await result.current.generate();
+    });
+    expect(result.current.state.snapshot).toEqual(fresh ? updated : snapshot);
+    expect(result.current.state.error).toBeNull();
+    expect(result.current.state.briefError).toBe("Try again.");
+    expect(result.current.state.brief).toBeNull();
+    unmount();
+  },
+);
+
+it("keeps the AI cooldown across source refresh without disabling source browsing", async () => {
+  vi.useFakeTimers();
+  fetchMock
+    .mockResolvedValueOnce(Response.json({ snapshot }))
+    .mockResolvedValueOnce(
+      Response.json(
+        {
+          error: "rate-limited",
+          stage: "brief",
+          message: "Wait.",
+          retryAfter: 60,
+          snapshot,
+        },
+        { status: 429 },
+      ),
+    )
+    .mockResolvedValueOnce(Response.json({ snapshot }));
+  const { result, unmount } = renderHook(() => useGitHubSources());
+  await act(async () => {});
+  await act(async () => {
+    await result.current.generate();
+  });
+  expect(result.current.state.retryAt).toBeNull();
+  expect(result.current.state.briefRetryAt).toBe(Date.now() + 60_000);
+  await act(async () => {
+    await result.current.refresh();
+  });
+  await act(async () => {
+    await result.current.generate();
+  });
+  expect(fetchMock).toHaveBeenCalledTimes(3);
+  await act(async () => {
+    await vi.advanceTimersByTimeAsync(60_000);
+  });
+  expect(result.current.state.briefRetryAt).toBeNull();
+  expect(fetchMock).toHaveBeenCalledTimes(3);
+  unmount();
+});
+
+it("clears a generated brief when a restored page rechecks an expired session", async () => {
+  fetchMock
+    .mockResolvedValueOnce(Response.json({ snapshot }))
+    .mockResolvedValueOnce(Response.json({ snapshot, brief }))
+    .mockResolvedValueOnce(
+      Response.json(
+        { error: "unauthorized", message: "Reconnect GitHub." },
+        { status: 401 },
+      ),
+    );
+  const { result, unmount } = renderHook(() => useGitHubSources());
+  await waitFor(() => expect(result.current.state.loading).toBe(false));
+  await act(async () => {
+    await result.current.generate();
+  });
+  expect(result.current.state.brief).toEqual(brief);
+  await act(async () => {
+    window.dispatchEvent(
+      new PageTransitionEvent("pageshow", { persisted: true }),
+    );
+  });
+  expect(result.current.state.brief).toBeNull();
+  expect(result.current.state.snapshot.items).toHaveLength(0);
+  expect(result.current.state.expired).toBe(true);
+  unmount();
+});

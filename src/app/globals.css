@@ -43,7 +43,7 @@
     border-color: var(--border);
   }
   html {
-    scroll-padding-top: 2rem;
+    scroll-padding-top: calc(68px + 1rem);
   }
   body {
     margin: 0;

@@ -18,7 +18,7 @@ describe("brief copy", () => {
       url: `https://github.com/example/atlas/issues/${source.number}`,
     }));
     const text = briefToText(
-      { ...sampleBrief, sourceIds: ["pr-142"], nextStep: undefined },
+      { ...sampleBrief, sourceIds: ["pr-142"], nextStep: null },
       items,
     );
     expect(text).toContain(items[0].url);

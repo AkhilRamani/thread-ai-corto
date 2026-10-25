@@ -48,6 +48,7 @@ export const partialBrief: WorkBrief = {
     "The pull request describes an account recovery screen and an email-based password reset flow. Issues are unavailable, so this brief only covers the pull request.",
   sourceIds: ["pr-142"],
   observations: [],
+  nextStep: null,
 };
 
 export const sparseSnapshot: SourceSnapshot = {
@@ -67,4 +68,5 @@ export const sparseBrief: WorkBrief = {
     "There is one open pull request, but its description is too short to connect the work or suggest a useful next step.",
   sourceIds: ["pr-142"],
   observations: [],
+  nextStep: null,
 };

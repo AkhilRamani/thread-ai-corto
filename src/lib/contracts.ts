@@ -1,3 +1,6 @@
+import type { WorkBrief } from "./brief-schema";
+export type { WorkBrief } from "./brief-schema";
+
 export type SourceItem = {
   id: string;
   kind: "pull-request" | "issue";
@@ -36,13 +39,21 @@ export type SourcesResponse =
   | { snapshot: SourceSnapshot }
   | { error: SourceErrorCode; message: string; retryAfter?: number };
 
-export type WorkBrief = {
-  title: string;
-  overview: string;
-  sourceIds: string[];
-  observations: { text: string; sourceIds: string[] }[];
-  nextStep?: { text: string; sourceIds: string[] };
-};
+export type BriefErrorCode =
+  | SourceErrorCode
+  | "invalid-output"
+  | "refused"
+  | "timeout"
+  | "quota-exhausted";
+export type BriefResponse =
+  | { snapshot: SourceSnapshot; brief: WorkBrief | null }
+  | {
+      error: BriefErrorCode;
+      message: string;
+      stage: "sources" | "brief";
+      snapshot?: SourceSnapshot;
+      retryAfter?: number;
+    };
 
 export function sourceLabel(source: SourceItem) {
   return `${source.repository} #${source.number}`;

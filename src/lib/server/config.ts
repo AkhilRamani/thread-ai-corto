@@ -43,3 +43,12 @@ export function isSameOrigin(request: Request) {
   const config = getAuthConfig();
   return !!config && request.headers.get("origin") === config.appUrl;
 }
+
+export function getAIConfig() {
+  const apiKey = process.env.OPENAI_API_KEY?.trim();
+  if (!apiKey) return null;
+  return {
+    apiKey,
+    model: process.env.OPENAI_MODEL?.trim() || "gpt-6-luna",
+  };
+}

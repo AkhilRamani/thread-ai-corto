@@ -57,7 +57,7 @@ describe("sample dashboard transitions", () => {
     expect(
       result.current.state.brief?.sourceIds.every((id) => ids.includes(id)),
     ).toBe(true);
-    expect(result.current.state.brief?.nextStep).toBeUndefined();
+    expect(result.current.state.brief?.nextStep).toBeNull();
   });
 
   it("cannot generate without source data and cancels work on unmount", () => {
