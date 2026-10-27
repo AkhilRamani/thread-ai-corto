@@ -1,6 +1,6 @@
 # Thread
 
-A developer workspace that turns GitHub activity into a useful starting point and checks whether project plans agree with the work. Built for the [MySubscriptions take-home assignment](MySubscriptions_TakeHome.md).
+A developer workspace that turns GitHub activity into a useful starting point and checks whether project plans agree with the work.
 
 - **PR brief:** a short overview and suggested next step from your public pull requests and assigned issues, with source details and discussions available alongside it.
 - **Plan check:** compare one public repository with up to five selected Notion pages, inspect cited disagreements, and explore the impact of a proposed requirement change.
