@@ -14,6 +14,7 @@ const authSchema = z.object({
   user: githubUserSchema,
   accessToken: z.string().min(1).max(1024),
   expiresAt: z.number().positive(),
+  nonce: z.string().min(20).max(100),
 });
 export type Auth = z.infer<typeof authSchema>;
 export type OAuthAttempt = {
@@ -22,7 +23,7 @@ export type OAuthAttempt = {
   expiresAt: number;
 };
 
-function options(name: string, ttl: number) {
+export function sessionOptions(name: string, ttl: number) {
   const config = getAuthConfig();
   if (!config) throw new Error("GitHub sign-in is not configured.");
   const secure =
@@ -44,14 +45,14 @@ function options(name: string, ttl: number) {
 export async function getSession() {
   return getIronSession<{ auth: Auth }>(
     await cookies(),
-    options("session", SESSION_TTL),
+    sessionOptions("session", SESSION_TTL),
   );
 }
 
 export async function getOAuthSession() {
   return getIronSession<{ attempt: OAuthAttempt }>(
     await cookies(),
-    options("oauth", OAUTH_TTL),
+    sessionOptions("oauth", OAUTH_TTL),
   );
 }
 

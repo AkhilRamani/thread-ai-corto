@@ -10,6 +10,7 @@ import type {
 } from "@/lib/contracts";
 import { sourceSelection } from "@/lib/source-selection";
 import { getAIConfig } from "./config";
+import { retryDelay } from "./errors";
 
 const briefErrorMessages: Partial<Record<BriefErrorCode, string>> = {
   "not-configured":
@@ -100,16 +101,6 @@ export function validateBrief(
   return brief;
 }
 
-function retryDelay(headers?: Headers) {
-  const raw = headers?.get("retry-after");
-  const seconds = Number(raw);
-  const wait =
-    seconds > 0
-      ? seconds
-      : Math.ceil((Date.parse(raw ?? "") - Date.now()) / 1000);
-  return Number.isFinite(wait) && wait > 0 ? Math.min(wait, 3600) : 60;
-}
-
 export async function generateBrief(
   snapshot: SourceSnapshot,
   signal?: AbortSignal,
@@ -163,7 +154,10 @@ export async function generateBrief(
       )
         throw new BriefError("quota-exhausted");
       if (error.status === 429)
-        throw new BriefError("rate-limited", retryDelay(error.headers));
+        throw new BriefError(
+          "rate-limited",
+          retryDelay(error.headers ?? new Headers()),
+        );
       if ([401, 403, 404].includes(error.status ?? 0))
         throw new BriefError("not-configured");
     }

@@ -17,7 +17,7 @@ export function BriefPanel({
 }: BriefPanelProps) {
   return (
     <section
-      className="relative isolate grid min-h-[320px] items-center overflow-hidden rounded-panel bg-[#5259dc] px-10 py-16 text-white max-[600px]:min-h-[300px] max-[600px]:px-6 max-[600px]:py-12"
+      className="relative isolate grid min-h-[380px] items-center overflow-hidden rounded-panel bg-[#5259dc] px-10 py-16 text-white max-[600px]:min-h-[300px] max-[600px]:px-6 max-[600px]:py-12"
       aria-label="Your work brief"
     >
       <Image

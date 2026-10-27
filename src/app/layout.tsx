@@ -4,9 +4,9 @@ import "@fontsource/ibm-plex-mono/400.css";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "MySubscriptions — Your work, back in context",
+  title: "Thread | PR brief & Plan check",
   description:
-    "A short, source-backed brief to help you pick up where you left off on GitHub.",
+    "Resume your GitHub work with a PR brief. Connect Notion to compare project plans with public GitHub work and inspect the evidence.",
   robots: { index: false, follow: false },
 };
 

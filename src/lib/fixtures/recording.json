@@ -1,0 +1,379 @@
+{
+  "label": "Recorded synthetic example",
+  "recordedAt": "2026-10-26T11:21:47.560Z",
+  "fixtureClock": "2026-10-26T04:00:00.000Z",
+  "snapshot": {
+    "selection": {
+      "repository": "synthetic-investigator/atlas",
+      "pageIds": [
+        "11111111-1111-4111-8111-111111111111",
+        "22222222-2222-4222-8222-222222222222",
+        "33333333-3333-4333-8333-333333333333"
+      ]
+    },
+    "repositoryUrl": "https://github.com/synthetic-investigator/atlas",
+    "evidence": [
+      {
+        "id": "github-142",
+        "provider": "github",
+        "kind": "pull-request",
+        "layer": "recent",
+        "title": "Password reset flow",
+        "url": "https://github.com/synthetic-investigator/atlas/pull/142",
+        "number": 142,
+        "status": "Open",
+        "author": "synthetic-developer",
+        "role": "MEMBER",
+        "createdAt": "2026-10-20T09:00:00Z",
+        "updatedAt": "2026-10-24T09:15:00Z",
+        "fetchedAt": "2026-10-26T11:21:34.233Z",
+        "passages": [
+          {
+            "id": "p-84961b03232963e4f344",
+            "text": "Implements account recovery. Inspect the PR discussion before concluding resend scope. Expired-link messaging is tracked in #138. Recovery expiry is configured as 900 seconds."
+          }
+        ],
+        "limitations": [
+          "discussion: 1 entries inspected on page 1. No further entries indicated by this page.",
+          "reviews: 0 entries inspected on page 1. No further entries indicated by this page.",
+          "review-comments: 0 entries inspected on page 1. No further entries indicated by this page.",
+          "timeline: 0 entries inspected on page 1. No further entries indicated by this page.",
+          "Changed-file excerpts only; this is not complete code or test coverage."
+        ],
+        "headSha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      },
+      {
+        "id": "github-138",
+        "provider": "github",
+        "kind": "issue",
+        "layer": "recent",
+        "title": "Expired recovery links",
+        "url": "https://github.com/synthetic-investigator/atlas/issues/138",
+        "number": 138,
+        "status": "Open",
+        "author": "synthetic-developer",
+        "role": "MEMBER",
+        "createdAt": "2026-10-20T09:00:00Z",
+        "updatedAt": "2026-10-24T09:15:00Z",
+        "fetchedAt": "2026-10-26T11:21:34.233Z",
+        "passages": [
+          {
+            "id": "p-9ccd7828638e84fb1d48",
+            "text": "Improve the expired-link error explanation. This request concerns error copy, independently of resend scope."
+          }
+        ],
+        "limitations": []
+      },
+      {
+        "id": "notion-11111111-1111-4111-8111-111111111111",
+        "provider": "notion",
+        "kind": "page",
+        "layer": "document",
+        "title": "Account recovery spec",
+        "url": "https://app.notion.com/p/11111111-1111-4111-8111-111111111111",
+        "updatedAt": "2026-10-24T09:15:00Z",
+        "createdAt": "2026-10-24T09:15:00Z",
+        "fetchedAt": "2026-10-26T11:21:34.235Z",
+        "passages": [
+          {
+            "id": "p-c2722afde441b73c387b",
+            "blockId": "44444444-4444-4444-8444-111111111111",
+            "heading": "",
+            "text": "Approved account recovery requirement: include the recovery resend action in the first release. Recovery links expire after fifteen minutes."
+          }
+        ],
+        "limitations": []
+      },
+      {
+        "id": "notion-22222222-2222-4222-8222-222222222222",
+        "provider": "notion",
+        "kind": "page",
+        "layer": "document",
+        "title": "Release checklist",
+        "url": "https://app.notion.com/p/22222222-2222-4222-8222-222222222222",
+        "updatedAt": "2026-10-24T09:15:00Z",
+        "createdAt": "2026-10-24T09:15:00Z",
+        "fetchedAt": "2026-10-26T11:21:34.235Z",
+        "passages": [
+          {
+            "id": "p-33ffc2ebcb24879529ee",
+            "blockId": "44444444-4444-4444-8444-222222222222",
+            "heading": "",
+            "text": "First-release checklist: recovery resend action included. Expired-link error explanation included."
+          }
+        ],
+        "limitations": []
+      },
+      {
+        "id": "notion-33333333-3333-4333-8333-333333333333",
+        "provider": "notion",
+        "kind": "page",
+        "layer": "document",
+        "title": "Recovery decisions",
+        "url": "https://app.notion.com/p/33333333-3333-4333-8333-333333333333",
+        "updatedAt": "2026-10-24T09:15:00Z",
+        "createdAt": "2026-10-24T09:15:00Z",
+        "fetchedAt": "2026-10-26T11:21:34.235Z",
+        "passages": [
+          {
+            "id": "p-101f83b95258854ade44",
+            "blockId": "44444444-4444-4444-8444-333333333333",
+            "heading": "",
+            "text": "Accepted decision: recovery links expire after fifteen minutes. Resend release scope follows the approved specification unless product explicitly changes it."
+          }
+        ],
+        "limitations": []
+      },
+      {
+        "id": "github-142:discussion-1",
+        "provider": "github",
+        "kind": "comment",
+        "layer": "detail",
+        "parentId": "github-142",
+        "title": "Password reset flow · discussion",
+        "url": "https://github.com/synthetic-investigator/atlas/pull/142#issuecomment-1",
+        "author": "synthetic-reviewer",
+        "role": "MEMBER",
+        "createdAt": "2026-10-21T10:00:00Z",
+        "updatedAt": "2026-10-24T09:15:00Z",
+        "fetchedAt": "2026-10-26T11:21:37.593Z",
+        "passages": [
+          {
+            "id": "p-1da9b6224f96c8364d0e",
+            "text": "Defer the recovery resend action to the follow-up. The current PR will ship without it. This is the implementation plan; product approval is not recorded here."
+          }
+        ],
+        "limitations": []
+      },
+      {
+        "id": "github-142:file-14b1e8ceb9da587a0fb9",
+        "provider": "github",
+        "kind": "file",
+        "layer": "detail",
+        "parentId": "github-142",
+        "title": "src/recovery/config.ts",
+        "url": "https://github.com/synthetic-investigator/atlas/blob/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa/src/recovery/config.ts",
+        "status": "modified",
+        "headSha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "fetchedAt": "2026-10-26T11:21:51.554Z",
+        "passages": [
+          {
+            "id": "p-bd55d8e3edccee411118",
+            "text": "@@ -1 +1 @@\n-export const recoveryExpirySeconds = 600;\n+export const recoveryExpirySeconds = 900;",
+            "file": {
+              "path": "src/recovery/config.ts",
+              "sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+              "startLine": 1
+            }
+          }
+        ],
+        "limitations": [
+          "Diff excerpt, not the complete file. Removed files may not exist at the head commit."
+        ]
+      },
+      {
+        "id": "github-142:file-ef68037b30687c2b5ce7",
+        "provider": "github",
+        "kind": "file",
+        "layer": "detail",
+        "parentId": "github-142",
+        "title": "src/recovery/expiry.test.ts",
+        "url": "https://github.com/synthetic-investigator/atlas/blob/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa/src/recovery/expiry.test.ts",
+        "status": "modified",
+        "headSha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "fetchedAt": "2026-10-26T11:21:51.554Z",
+        "passages": [
+          {
+            "id": "p-1d015e106dae91fee62f",
+            "text": "@@ -1 +1,2 @@\n+it('rejects recovery links after fifteen minutes', () => {\n+  expect(expirySeconds).toBe(900); });",
+            "file": {
+              "path": "src/recovery/expiry.test.ts",
+              "sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+              "startLine": 1
+            }
+          }
+        ],
+        "limitations": [
+          "Diff excerpt, not the complete file. Removed files may not exist at the head commit."
+        ]
+      }
+    ],
+    "fetchedAt": "2026-10-26T11:21:34.230Z",
+    "fingerprint": "b2aa2191a9b4184810eb9c2d242212717620a14186aa356a83c0d9218d79a99a",
+    "limitations": [
+      "GitHub search indexing can lag; merged does not mean deployed."
+    ],
+    "trace": [
+      {
+        "operation": "Verify public repository",
+        "outcome": "ok",
+        "sourceIds": [],
+        "detail": "synthetic-investigator/atlas"
+      },
+      {
+        "operation": "Load recent GitHub work",
+        "outcome": "ok",
+        "sourceIds": ["github-142", "github-138"],
+        "detail": "2 source(s) returned."
+      },
+      {
+        "operation": "Read selected Notion page",
+        "outcome": "ok",
+        "sourceIds": ["notion-11111111-1111-4111-8111-111111111111"],
+        "detail": "1 source(s) returned."
+      },
+      {
+        "operation": "Read selected Notion page",
+        "outcome": "ok",
+        "sourceIds": ["notion-22222222-2222-4222-8222-222222222222"],
+        "detail": "1 source(s) returned."
+      },
+      {
+        "operation": "Read selected Notion page",
+        "outcome": "ok",
+        "sourceIds": ["notion-33333333-3333-4333-8333-333333333333"],
+        "detail": "1 source(s) returned."
+      },
+      {
+        "operation": "Select evidence, round 1",
+        "outcome": "ok",
+        "sourceIds": [],
+        "detail": "1 read(s) requested."
+      },
+      {
+        "operation": "discussion: github-142",
+        "outcome": "ok",
+        "sourceIds": ["github-142", "github-142:discussion-1"],
+        "detail": "1 additional sources returned; coverage is attached to each source."
+      },
+      {
+        "operation": "Select evidence, round 2",
+        "outcome": "ok",
+        "sourceIds": [],
+        "detail": "0 read(s) requested."
+      },
+      {
+        "operation": "Synthesize findings",
+        "outcome": "ok",
+        "sourceIds": [],
+        "detail": "1 finding(s), validated passage references."
+      },
+      {
+        "operation": "Select evidence, round 1",
+        "outcome": "ok",
+        "sourceIds": [],
+        "detail": "1 read(s) requested."
+      },
+      {
+        "operation": "files: github-142",
+        "outcome": "ok",
+        "sourceIds": [
+          "github-142",
+          "github-142:file-14b1e8ceb9da587a0fb9",
+          "github-142:file-ef68037b30687c2b5ce7"
+        ],
+        "detail": "2 additional sources returned; coverage is attached to each source."
+      },
+      {
+        "operation": "Select evidence, round 2",
+        "outcome": "ok",
+        "sourceIds": [],
+        "detail": "0 read(s) requested."
+      },
+      {
+        "operation": "Assess proposed change",
+        "outcome": "ok",
+        "sourceIds": [],
+        "detail": "4 affected item(s), validated passage references."
+      }
+    ]
+  },
+  "investigation": {
+    "output": {
+      "overview": "The supplied evidence shows a direct scope conflict: the approved specification requires recovery resend in the first release, while the PR discussion says the current PR will ship without it and defers it to follow-up. The discussion explicitly says product approval is not recorded, and the accepted decision says the approved specification governs unless product changes it.",
+      "findings": [
+        {
+          "category": "conflicting-expectations",
+          "title": "Recovery resend is required by the approved plan but deferred in the PR",
+          "discovery": "The approved account recovery requirement includes the resend action in the first release. The PR discussion instead says the action is deferred to follow-up and that the current PR will ship without it; that comment also states product approval is not recorded.",
+          "whyItMatters": "Unless product explicitly changes the approved scope, shipping without resend would not meet the documented first-release requirement.",
+          "suggestedAction": "Resolve the scope with product before treating the PR plan as authoritative. If the approved requirement still stands, include resend in the first release; otherwise record an explicit product decision changing the scope.",
+          "evidence": [
+            "p-c2722afde441b73c387b",
+            "p-1da9b6224f96c8364d0e",
+            "p-101f83b95258854ade44",
+            "p-33ffc2ebcb24879529ee"
+          ],
+          "counterevidencePassageIds": [],
+          "unknowns": [
+            "Whether product has made a scope change outside the supplied evidence.",
+            "Whether resend is present in the PR's code or another implementation, beyond the discussion's stated plan."
+          ]
+        }
+      ],
+      "limitations": [
+        "The supplied PR is open; the evidence does not establish whether the work is merged or deployed.",
+        "No code diff or test results were supplied, so implementation and test status cannot be verified.",
+        "The PR discussion coverage reports one entry inspected and no further entries indicated on that page; other conversation or later resolution outside the supplied evidence cannot be ruled out."
+      ]
+    },
+    "metrics": {
+      "model": "gpt-6-luna",
+      "calls": 3,
+      "inputTokens": 4644,
+      "outputTokens": 1008,
+      "latencyMs": 13317,
+      "providerRequests": 12
+    },
+    "completedAt": "2026-10-26T11:21:47.560Z"
+  },
+  "impact": {
+    "output": {
+      "explanation": "The proposed five-minute expiry would change the accepted fifteen-minute requirement. The inspected implementation and expiry test currently use 900 seconds, equivalent to fifteen minutes, so they would need review if the change is approved. This is an impact assessment, not evidence that the proposed change has been accepted or that the inspected tests pass.",
+      "affected": [
+        {
+          "title": "Account recovery spec",
+          "reason": "The approved requirement specifies a fifteen-minute expiry, which conflicts with the proposed five-minute requirement.",
+          "evidence": ["p-c2722afde441b73c387b"],
+          "suggestedCheck": "If product approves the change, update the approved specification to five minutes and check dependent requirements for consistency.",
+          "effect": "directly-evidenced"
+        },
+        {
+          "title": "Recovery decisions",
+          "reason": "The accepted decision specifies fifteen minutes; it also says the approved specification governs resend scope unless product explicitly changes it. The proposed expiry change needs explicit approval and a corresponding decision update.",
+          "evidence": ["p-101f83b95258854ade44"],
+          "suggestedCheck": "Record explicit product approval for the new expiry and update the accepted decision; separately verify resend scope remains as approved.",
+          "effect": "directly-evidenced"
+        },
+        {
+          "title": "src/recovery/config.ts",
+          "reason": "The inspected diff sets recoveryExpirySeconds to 900, equivalent to fifteen minutes; a five-minute setting would be 300 seconds.",
+          "evidence": ["p-bd55d8e3edccee411118"],
+          "suggestedCheck": "If the change is approved, inspect the complete configuration and relevant consumers, then update and verify the configured expiry as appropriate.",
+          "effect": "directly-evidenced"
+        },
+        {
+          "title": "src/recovery/expiry.test.ts",
+          "reason": "The inspected test excerpt expects 900 seconds and describes a fifteen-minute expiry, so its expectation would need review against an approved five-minute requirement.",
+          "evidence": ["p-1d015e106dae91fee62f"],
+          "suggestedCheck": "If approved, update or replace the expiry expectation and run the relevant tests; the supplied excerpt does not establish test results.",
+          "effect": "directly-evidenced"
+        }
+      ],
+      "unexamined": [
+        "The full recovery implementation, including link issuance and validation paths, and other configuration or tests were not supplied; their impact is unknown.",
+        "The proposed five-minute requirement is not shown as approved. The inspected decision still specifies fifteen minutes.",
+        "The PR discussion says resend is deferred but explicitly lacks recorded product approval; the approved specification says resend is included in the first release. The expiry change does not resolve that separate scope conflict."
+      ]
+    },
+    "metrics": {
+      "model": "gpt-6-luna",
+      "calls": 3,
+      "inputTokens": 5913,
+      "outputTokens": 1162,
+      "latencyMs": 13702,
+      "providerRequests": 15
+    }
+  },
+  "question": "What if recovery links must expire after five minutes instead of fifteen?"
+}

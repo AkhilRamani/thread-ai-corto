@@ -8,7 +8,7 @@ export function SourceKindIcon({ kind }: { kind: SourceItem["kind"] }) {
   return (
     <span
       className={cn(
-        "grid size-12 place-items-center rounded-xl bg-cover bg-center text-white max-[600px]:size-10 max-[600px]:rounded-[10px]",
+        "grid size-12 shrink-0 place-items-center rounded-xl bg-cover bg-center text-white max-[600px]:size-10 max-[600px]:rounded-[10px]",
         kind === "pull-request"
           ? "bg-[#6683ff] bg-[url('/images/source-pr-gradient.png')]"
           : "bg-[#69d7b4] bg-[url('/images/source-issue-gradient.png')]",

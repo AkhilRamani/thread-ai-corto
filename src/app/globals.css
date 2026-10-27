@@ -1,5 +1,86 @@
 @import "tailwindcss";
 
+.ai-action {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+}
+.ai-action::before {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  content: "";
+  pointer-events: none;
+  background: linear-gradient(
+    110deg,
+    transparent 15%,
+    rgb(164 147 255 / 30%) 50%,
+    transparent 85%
+  );
+  opacity: 0;
+  transform: translateX(-120%);
+}
+.ai-action:not(:disabled):hover::before,
+.ai-action[aria-busy="true"]::before {
+  opacity: 1;
+  animation: ai-sheen 2.8s ease-in-out infinite;
+}
+.ai-finding-selected {
+  background: linear-gradient(110deg, #f7f6fc, #faf4ff);
+}
+.ai-loading-sheen {
+  background: linear-gradient(
+    110deg,
+    transparent 20%,
+    rgb(255 255 255 / 65%) 50%,
+    transparent 80%
+  );
+  animation: ai-sheen 3.4s ease-in-out infinite;
+}
+@keyframes ai-sheen {
+  from {
+    transform: translateX(-120%);
+  }
+  to {
+    transform: translateX(120%);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ai-action::before,
+  .ai-loading-sheen {
+    animation: none !important;
+    transform: none;
+  }
+}
+
+.accordion-content[data-state="open"] {
+  animation: accordion-down 200ms ease-out;
+}
+.accordion-content[data-state="closed"] {
+  animation: accordion-up 200ms ease-out;
+}
+@keyframes accordion-down {
+  from {
+    height: 0;
+  }
+  to {
+    height: var(--radix-accordion-content-height);
+  }
+}
+@keyframes accordion-up {
+  from {
+    height: var(--radix-accordion-content-height);
+  }
+  to {
+    height: 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .accordion-content[data-state] {
+    animation: none;
+  }
+}
+
 :root {
   --background: #fff;
   --foreground: #0a0a0a;
@@ -15,6 +96,82 @@
   --font-label: "IBM Plex Mono", monospace;
 }
 
+.workspace-layout {
+  --workspace-gutter: 32px;
+  --workspace-content-width: 860px;
+  --workspace-panel-gap: 32px;
+  --workspace-panel-width: clamp(
+    360px,
+    calc(
+      100vw - var(--workspace-content-width) - var(--workspace-panel-gap) -
+        var(--workspace-gutter) - var(--workspace-gutter)
+    ),
+    520px
+  );
+  width: 100%;
+  padding: 40px var(--workspace-gutter) 48px;
+  overflow-x: clip;
+}
+.workspace-content {
+  min-width: 0;
+  width: min(var(--workspace-content-width), 100%);
+  margin-left: max(0px, calc((100% - var(--workspace-content-width)) / 2));
+  transition:
+    margin-left 320ms cubic-bezier(0.22, 1, 0.36, 1),
+    width 320ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+.workspace-layout[data-inspector-open="true"] > .workspace-content {
+  width: min(
+    var(--workspace-content-width),
+    calc(100% - var(--workspace-panel-width) - var(--workspace-panel-gap))
+  );
+  margin-left: 0;
+}
+.workspace-inspector {
+  position: fixed;
+  z-index: 10;
+  top: 100px;
+  right: 0;
+  bottom: 20px;
+  width: calc(var(--workspace-panel-width) + var(--workspace-gutter));
+  overflow-y: auto;
+  border-left: 1px solid var(--border);
+  padding: 0 var(--workspace-gutter) 32px 28px;
+  background: var(--background);
+  outline: none;
+  animation: workspace-inspector-enter 320ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+@keyframes workspace-inspector-enter {
+  from {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+@media (max-width: 1000px) {
+  .workspace-layout[data-inspector-open="true"] > .workspace-content {
+    width: min(var(--workspace-content-width), 100%);
+    margin-left: max(0px, calc((100% - var(--workspace-content-width)) / 2));
+  }
+  .workspace-inspector {
+    z-index: 40;
+    inset: 0;
+    width: auto;
+    height: 100dvh;
+    border: 0;
+    padding: var(--workspace-gutter);
+  }
+}
+@media (max-width: 600px) {
+  .workspace-layout {
+    --workspace-gutter: 20px;
+    padding-top: 28px;
+  }
+}
+
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -27,6 +184,19 @@
   --color-border: var(--border);
   --font-sans: var(--font-body);
   --font-mono: var(--font-label);
+  /* Interface hierarchy follows the measured reference; brief artwork keeps its own type. */
+  --text-ui-title: 40px;
+  --text-ui-title--line-height: 48px;
+  --text-ui-section: 24px;
+  --text-ui-section--line-height: 30px;
+  --text-ui-item: 20px;
+  --text-ui-item--line-height: 30px;
+  --text-ui-body: 16px;
+  --text-ui-body--line-height: 26px;
+  --text-ui-meta: 14px;
+  --text-ui-meta--line-height: 22px;
+  --text-ui-label: 12px;
+  --text-ui-label--line-height: 18px;
   --radius-panel: var(--radius);
   /* Preserve the approved contrast treatment over the brief artwork. */
   --background-image-brief-scrim: linear-gradient(

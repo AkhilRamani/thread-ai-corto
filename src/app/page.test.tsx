@@ -29,7 +29,7 @@ it("ignores inherited, unknown, and repeated auth query values without crashing"
     const html = renderToStaticMarkup(
       await HomePage({ searchParams: Promise.resolve({ auth }) }),
     );
-    expect(html).toContain("Pick up where you left off.");
+    expect(html).toContain("Pick up your work. Check it against the plan.");
     expect(html).not.toContain('role="alert"');
   }
 });

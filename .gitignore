@@ -8,6 +8,7 @@ coverage/
 .DS_Store
 next-env.d.ts
 
-/docs/design/qa/
-/docs/design/reference/
+/docs/design/
+/docs/verification/
+/evals/results/
 /design-qa.md

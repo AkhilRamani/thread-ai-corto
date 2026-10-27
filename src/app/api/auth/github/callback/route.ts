@@ -1,4 +1,6 @@
-import { getAuthConfig } from "@/lib/server/config";
+import { randomBytes } from "node:crypto";
+import { clearNotionConnection } from "@/lib/server/notion-oauth";
+import { getAuthConfig, isCallbackOrigin } from "@/lib/server/config";
 import { getGitHubUser } from "@/lib/server/github";
 import { exchangeCode, validOAuthState } from "@/lib/server/oauth";
 import { authRedirect } from "@/lib/server/responses";
@@ -8,6 +10,7 @@ export const runtime = "nodejs";
 
 export async function GET(request: Request) {
   if (!getAuthConfig()) return authRedirect("/?auth=not-configured");
+  if (!isCallbackOrigin(request)) return authRedirect("/?auth=invalid-state");
   const pending = await getOAuthSession();
   const attempt = pending.attempt;
   pending.destroy();
@@ -21,7 +24,9 @@ export async function GET(request: Request) {
     const token = await exchangeCode(code, attempt!.verifier);
     const user = await getGitHubUser(token.access_token);
     const session = await getSession();
+    await clearNotionConnection();
     session.auth = {
+      nonce: randomBytes(24).toString("base64url"),
       user,
       accessToken: token.access_token,
       expiresAt:

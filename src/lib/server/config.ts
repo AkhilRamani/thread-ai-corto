@@ -52,3 +52,30 @@ export function getAIConfig() {
     model: process.env.OPENAI_MODEL?.trim() || "gpt-6-luna",
   };
 }
+
+export function getNotionConfig() {
+  const auth = getAuthConfig();
+  const clientId = process.env.NOTION_CLIENT_ID?.trim();
+  const clientSecret = process.env.NOTION_CLIENT_SECRET?.trim();
+  return auth && clientId && clientSecret
+    ? {
+        clientId,
+        clientSecret,
+        callbackUrl: `${auth.appUrl}/api/auth/notion/callback`,
+      }
+    : null;
+}
+
+// Next's internal listener URL can differ from the browser's Host header locally.
+// Validate the public host without trusting forwarded-host input; OAuth state remains mandatory.
+export function isCallbackOrigin(request: Request) {
+  const config = getAuthConfig();
+  if (!config) return false;
+  const expected = new URL(config.appUrl);
+  const actual = new URL(request.url);
+  const host = request.headers.get("host") ?? actual.host;
+  return (
+    host.toLowerCase() === expected.host.toLowerCase() &&
+    actual.protocol === expected.protocol
+  );
+}

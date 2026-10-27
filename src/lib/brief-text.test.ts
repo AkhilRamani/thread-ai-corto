@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { briefToText } from "./brief-text";
-import { sampleBrief, sampleSnapshot } from "./sample-data";
+import { sampleBrief, sampleSnapshot } from "./brief-sample";
 
 describe("brief copy", () => {
   it("labels sample data honestly and includes evidence without invented URLs", () => {

@@ -1,145 +1,57 @@
-# MySubscriptions product and system design
+# Architecture and design
 
-## Product direction
+Thread answers two separate questions: “Where should I resume my work?” and “Does the work agree with the plan?” PR brief uses personal GitHub activity; Plan check uses an explicitly selected repository and Notion pages. GitHub supplies identity, while Notion is an optional secondary connection.
 
-MySubscriptions helps developers pick up where they left off. It connects to GitHub, presents recent work and open threads, and generates a short AI brief explaining the main themes and a sensible next step.
+## Structure
 
-The value is reconstructing context across related work. Every insight links to its sources so the user can inspect the evidence and act in GitHub. Activity counts are not treated as productivity measures.
-
-This document defines the agreed product and system. The interface, sample flow, GitHub OAuth, public source retrieval, and AI generation integration are implemented. Live generation and initial model evaluation have been checked; hosted verification remains pending. The [take-home assignment](../MySubscriptions_TakeHome.md) defines the submission requirements.
-
-## Requirements and scope
-
-- Sign in and connect GitHub through one OAuth flow.
-- Retrieve and display the user's public PRs and assigned issues.
-- Generate a useful brief grounded in the retrieved data.
-- Let the user inspect sources, refresh data, copy the brief, and sign out.
-- Provide a clearly labelled sample for reviewers with limited public activity.
-- Support responsive layouts, keyboard navigation, and recoverable failure states.
-- Deliver a public repository, hosted application, setup instructions, `.env.example`, and documentation of limitations and future work.
-
-The first version supports one service and public, read-only data. Private repositories, code analysis, chat, automated GitHub changes, saved history, and background sync are outside scope.
-
-## Technology stack
-
-| Area | Technology |
-| --- | --- |
-| Application | Next.js App Router, React, TypeScript |
-| Interface | shadcn/ui, Tailwind CSS, Lucide icons |
-| Authentication | Direct GitHub OAuth; `iron-session` for encrypted cookie sessions |
-| GitHub integration | Server-side native `fetch` |
-| AI | OpenAI Responses API and official JavaScript SDK |
-| Model | GPT-6 Luna, configured as `OPENAI_MODEL=gpt-6-luna` |
-| Validation | Zod |
-| Testing | Vitest, React Testing Library, and manual browser verification |
-| Hosting | Vercel, Node.js runtime |
-| Tooling | pnpm, committed lockfile, ESLint, TypeScript checks |
-| Persistence | No application database |
-
-GitHub is the identity provider. The application owns the small OAuth callback and session flow, without an external auth platform. GitHub's [authorization code flow](https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/authorizing-oauth-apps) supplies identity and API access; [iron-session](https://github.com/vvo/iron-session) handles session encryption. [GPT-6 Luna](https://developers.openai.com/api/docs/models/gpt-6-luna) supports the structured output required by the brief.
-
-## System architecture
-
-One Next.js application contains the interface and server operations. Authentication, GitHub retrieval, and brief generation are separate modules within that application.
-
-Routes and page composition live in `src/app`. Shared shadcn primitives live in `src/components/ui`, and product components such as the brief and source list live in `src/components/dashboard`. Server-only authentication, GitHub, and AI logic live in `src/lib/server`; shared data contracts live in `src/lib/contracts.ts`. UI components receive typed data and callbacks rather than calling providers directly.
+A single Next.js App Router application keeps presentation, provider access and AI orchestration together without a separate backend or database.
 
 ```mermaid
 flowchart LR
-    Browser[Browser] --> App[Next.js application]
-    App --> GitHub[GitHub OAuth and API]
-    App --> AI[OpenAI GPT-6 Luna]
-    App --> Browser
+    UI[Workspace] --> API[Authenticated route handlers]
+    API --> Sources[Provider adapters and evidence registry]
+    Sources --> GitHub[Public GitHub APIs]
+    Sources --> Notion[Selected Notion pages]
+    API --> AI[Bounded AI orchestration]
+    AI --> Sources
+    AI --> OpenAI[OpenAI Responses API]
 ```
 
-The browser displays data and manages interactions. The server authenticates requests, retrieves GitHub data, calls the model, and validates the result. Provider tokens are never exposed to browser JavaScript. There is no separate backend service or application database.
+| Area                                                       | Responsibility                                                   |
+| ---------------------------------------------------------- | ---------------------------------------------------------------- |
+| `src/components/dashboard/`                                | Navigation, PR brief and shared inspector                        |
+| `src/components/investigator/`                             | Source setup, findings, impact and request lifecycle             |
+| `src/app/api/`                                             | Thin authenticated route handlers                                |
+| `src/lib/server/github.ts`, `github-brief.ts`, `notion.ts` | Provider retrieval, visibility checks and normalization          |
+| `src/lib/server/project.ts`                                | Evidence registry, validated reads and content fingerprints      |
+| `src/lib/server/brief.ts`, `investigator.ts`               | Model calls and output validation                                |
+| `src/lib/server/*oauth*`, `session.ts`, `api.ts`           | Authentication, encrypted sessions and shared request boundaries |
 
-### Authentication
+Shared contracts are in [contracts.ts](../src/lib/contracts.ts); Plan check request, text and model budgets are in [limits.ts](../src/lib/limits.ts). Personal PR collection limits are in [source-selection.ts](../src/lib/source-selection.ts).
 
-“Continue with GitHub” starts the authorization code flow with state validation and PKCE. The callback exchanges the code server-side, verifies identity through GitHub's user endpoint, and creates a short-lived encrypted, HTTP-only session cookie containing the identity and provider token.
+## AI flow
 
-Only public-data permissions are requested. Protected operations derive identity from the session. Expired or revoked access prompts reconnection. Sign-out clears the session and visible data; GitHub authorization can be revoked separately. Stateless sessions do not provide immediate revocation of a copied cookie before expiry.
+**PR brief** retrieves fresh public authored PRs and assigned issues, then makes one structured model call for an overview, observations and a suggested next step.
 
-### Data and generation flow
+**Plan check** retrieves the selected sources, then permits up to two evidence-selection calls and one synthesis within a 55-second deadline. The model can request discussion, changed files from a known PR, or an explicitly linked item in the same repository. The server validates and executes these reads; it never fetches a model-supplied URL.
 
-1. After sign-in, the server fetches and normalizes the selected GitHub data.
-2. The dashboard shows the source items, coverage, and fetch time.
-3. The user selects “Generate my brief” after seeing what data will be sent to OpenAI.
-4. The server fetches a fresh snapshot, makes one structured model request, and validates the response.
-5. The dashboard displays the brief alongside the exact snapshot it describes.
+Each source has stable passage IDs, a validated original link and coverage information. File excerpts retain a commit SHA; retrieval checks that the PR head did not move. Zod validates output shape and references against the inspected passages. The model may return zero findings. Prompts distinguish accepted decisions from proposals, account for resolved discussions and equivalent wording, and treat source text as untrusted data.
 
-Refresh clears the previous brief. A generation failure leaves the source data usable. Briefs and source snapshots are not persisted across sessions.
+**Impact assessment** re-fetches sources and replays earlier reads. An HMAC-signed, session-bound receipt contains scope, read descriptors, expiry and a content fingerprint, without source text or credentials. If evidence changes or cannot be reconstructed, another investigation is required.
 
-## Data and AI behaviour
+## Security and failure handling
 
-| Data | Selection |
-| --- | --- |
-| Recently updated authored PRs | Last 14 days, maximum 20 |
-| Open authored PRs | Maximum 10, including items outside the recent window |
-| Open assigned issues | Maximum 10 |
+- GitHub OAuth uses state and PKCE. Notion uses its public OAuth flow; its separate encrypted cookie is bound to the GitHub session and cannot outlive it. Sign-out or a new GitHub login clears the secondary connection.
+- Provider tokens never enter browser props or model input. GitHub repository visibility and provider links are validated server-side. Source access is read-only.
+- Authenticated same-origin POSTs, bounded bodies and responses, request deadlines and no-store headers apply to data operations. SDK retries and logging are disabled. OpenAI calls use `store: false`, which is not a guarantee of zero provider retention.
+- Partial failures preserve inspectable evidence. Model failures do not fabricate output. Expired connections prompt reconnection; provider retry delays disable further requests until retry is allowed.
 
-Each collection is ordered by latest update. Overlapping items are deduplicated. The interface identifies public-only coverage, capped results, and partial retrieval. These selections are not a complete backlog.
+The browser retains each visited tool while switching views. One request controller owns a Plan check operation, preventing duplicate submissions and obsolete responses from restoring invalidated state. Scope edits, refresh, disconnection and unmount cancel pending work. The details inspector preserves source context without navigating away.
 
-The model receives titles, bounded descriptions, repositories, labels, observed statuses, and timestamps. Code, diffs, and full discussion histories are excluded.
+## Trade-offs
 
-The brief contains:
+Stateless sessions and page-memory results keep deployment simple, at the cost of repeated provider reads and no durable history. Request, pagination, text and model budgets bound latency and cost, but can omit later discussion resolution or relevant implementation. Coverage gaps remain visible with the evidence.
 
-- A short, direct overview of the work.
-- Up to three observations connecting related items or surfacing open threads.
-- One suggested starting point with a reason, when evidence supports it. It appears immediately below the overview, before observations, with a primary link to its first cited GitHub source. Regeneration is secondary.
-- Source references for the overview, each observation, and the suggested starting point.
+Schema and reference validation cannot establish semantic correctness. Findings must remain qualified, particularly when authority conflicts or coverage is incomplete. Reading a test is not evidence that it passes, and merged work is not proof of deployment.
 
-Application code supplies facts and coverage; the model interprets the available text. Zod validates the output, and the server checks source references against the snapshot. Links come from GitHub data rather than model-generated URLs.
-
-The model can return insufficient context instead of inventing a priority. It cannot infer approvals, blockers, code correctness, or completion without evidence. Repository text is treated as untrusted input, and generation has no tools or write access.
-
-## User experience
-
-### Entry
-
-The entry screen leads with “Pick up where you left off,” a representative brief, and two actions: “Continue with GitHub” and “Explore sample.” Public-only access is explained before connection.
-
-### Dashboard
-
-The page follows a single reading order:
-
-1. Connected account, data coverage, fetch time, and refresh action.
-2. The work brief and suggested next step.
-3. The supporting PRs and issues, with repository, status, update time, and GitHub links.
-
-Before generation, the brief area explains the action while the source list is already usable. Selecting an insight reveals its supporting items. “Copy brief” includes source links.
-
-The sample reuses the dashboard with fixed data and a prerecorded brief. It is visibly labelled and never replaces live results silently.
-
-### Visual design
-
-The visual reference is [Design Systems Surf](https://designsystems.surf/), including its library, footer, and the supplied wave panel. The selected layout leads with the insight. A spacious blue, lavender, peach, and yellow wave panel holds the brief; the next step, controls, and source list sit on white below. Match the reference's Inter Display headings, Inter body text, IBM Plex Mono labels, black pill buttons with white labels, and generous spacing. Colour is concentrated in the brief panel and small source-kind tiles. The measured values and application mapping are recorded in [the visual foundation](design/visual-foundation.md). shadcn/ui supplies shared controls styled through common theme tokens. Desktop and mobile preserve the same content hierarchy; a permanent sidebar is unnecessary. Visual checks cover spacing, typography, contrast, and responsive wrapping.
-
-Delight comes from immediate context, clear evidence, useful copy, and fast navigation back to GitHub. Controls support keyboard use, visible focus, accessible status messages, and reduced motion. Colour is never the only status indicator.
-
-### Failure states
-
-| Situation | Behaviour |
-| --- | --- |
-| Sign-in cancelled or access expired | Offer retry or reconnect. |
-| No matching public activity | Explain the coverage and offer the sample. |
-| GitHub data partly unavailable | Show available items and clearly label partial coverage. |
-| GitHub data entirely unavailable | Show a retrieval error; do not generate a brief. |
-| AI failure or rate limit | Preserve source data and offer an appropriate retry. |
-| Weak evidence | State the limitation instead of fabricating an insight. |
-
-## Quality and operational boundaries
-
-Authentication and same-origin checks protect server operations. Cookies use secure production settings. Secrets and source content stay out of logs, and user responses are not placed in shared caches.
-
-The generation endpoint uses the existing bounded source selection, a 2,400-token output cap, a 30-second model timeout, and no automatic retries. Hosting-level rate limiting must be configured before public deployment; client cooldowns are not an abuse-control boundary. There is no anonymous live generation. Selected public data is sent to OpenAI only on request, with response storage disabled; this does not imply zero provider retention.
-
-Focused tests cover the OAuth callback and session boundaries, data normalization, partial results, source validation, and the main dashboard flow. Local browser checks have covered GitHub sign-in, source retrieval, refresh, and source links. Hosted verification remains pending. Automated checks cover the SDK request, schema and citation validation, refusals, timeouts, rate limits, source preservation, and stale requests using mocked provider responses. A separate live evaluation command covers related, unrelated, sparse, and adversarial descriptions to assess grounding and usefulness; running it requires an OpenAI key. Valid citations alone do not prove that an interpretation is correct.
-
-The database-free design keeps deployment small. It deliberately excludes durable quotas, saved briefs, and cross-device history.
-
-## Future direction
-
-- Add selected comments and review state to improve grounding; refine accessibility and evaluations.
-- Add selected private repositories through a GitHub App with granular permissions.
-- Validate repeat usefulness, then add saved comparisons or scheduled briefs where justified.
+See [evaluation](evaluation.md) for the recorded checks and their limits, and the [README](../README.md#limitations-and-next-steps) for deployment requirements and next steps.

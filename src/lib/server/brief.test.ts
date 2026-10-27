@@ -2,7 +2,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 vi.mock("server-only", () => ({}));
 import { briefInput, generateBrief, validateBrief } from "./brief";
-import { sampleBrief, sampleSnapshot } from "@/lib/sample-data";
+import { sampleBrief, sampleSnapshot } from "@/lib/brief-sample";
 
 const fetchMock = vi.fn<typeof fetch>();
 const modelResponse = (brief: unknown = sampleBrief, extra = {}) =>

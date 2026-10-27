@@ -1,0 +1,23 @@
+// One set of retrieval boundaries, shared by providers, orchestration and UI.
+export const limits = {
+  recentDays: 14,
+  pickerResults: 30,
+  recentItems: 10,
+  initialRequests: 20,
+  additionalRequests: 6,
+  concurrency: 3,
+  evidenceCharacters: 60_000,
+  responseBytes: 1_000_000,
+  textCharacters: 4000,
+  patchCharacters: 6000,
+  blocks: 120,
+  depth: 3,
+  pages: 5,
+  pageSize: 30,
+  deepItems: 3,
+  historicalItems: 2,
+  readAttempts: 6,
+  rounds: 2,
+  deadlineMs: 55_000,
+  synthesisReserveMs: 18_000,
+} as const;

@@ -6,7 +6,6 @@ import { Button } from "@/components/ui/button";
 import { SiteHeader } from "@/components/dashboard/site-header";
 import { getAuthConfig } from "@/lib/server/config";
 import { getSignedInUser } from "@/lib/server/session";
-import { sampleBrief } from "@/lib/sample-data";
 
 export const dynamic = "force-dynamic";
 
@@ -37,12 +36,13 @@ export default async function HomePage({
   return (
     <PageShell
       header={<SiteHeader user={user ?? undefined} mode="entry" />}
-      eyebrow="Your work, back in context"
-      title="Pick up where you left off."
+      eyebrow="Your work, with context"
+      title="Pick up your work. Check it against the plan."
     >
       <p className="max-w-[560px] text-[18px] leading-7 text-muted-foreground">
-        Bring your recent pull requests and open threads together. Find your way
-        back into the work.
+        Sign in with GitHub for a brief on your pull requests and assigned
+        issues. Add Notion when you want to see where project plans and GitHub
+        work disagree.
       </p>
       {message && (
         <p
@@ -67,16 +67,17 @@ export default async function HomePage({
           )}
         </Button>
         <Button variant="secondary" asChild>
-          <Link href="/sample">Explore sample</Link>
+          <Link href="/sample">Explore an example</Link>
         </Button>
       </div>
       <p className="mt-5 max-w-[560px] text-[14px] text-muted-foreground">
-        Public pull requests and assigned issues only. We do not request access
-        to private repositories or modify your GitHub work.
+        GitHub sign-in also connects your public GitHub work. Notion is
+        optional. Connections are read-only. Selected content is sent to OpenAI
+        only when you generate a brief or run a plan check.
       </p>
       <section
         className="mt-16 relative isolate grid min-h-[380px] items-center overflow-hidden rounded-panel bg-[#5259dc] px-10 pt-[120px] pb-[72px] text-white max-[600px]:min-h-[360px] max-[600px]:px-6 max-[600px]:py-16"
-        aria-label="Illustrative sample brief"
+        aria-label="Illustrative example finding"
       >
         <Image
           src="/images/brief-wave.webp"
@@ -89,13 +90,24 @@ export default async function HomePage({
         <div className="absolute inset-0 -z-1 bg-brief-scrim" />
         <div className="mx-auto w-full max-w-[560px] text-center">
           <p className="mb-6 font-mono text-[12px] leading-[18px] font-normal uppercase">
-            Illustrative sample
+            Example finding · Synthetic data
           </p>
           <p className="text-[22px] leading-8 tracking-[-0.02em] text-pretty max-[600px]:text-[18px] max-[600px]:leading-7">
-            {sampleBrief.overview}
+            The resend action has two different plans.
+          </p>
+          <p className="mt-4 text-[16px] leading-7">
+            The specification requires resend in the first release. The PR
+            discussion defers it, while the release checklist still includes it.
           </p>
         </div>
       </section>
+      <p className="mt-6 max-w-[650px] text-[15px] leading-7 text-muted-foreground">
+        A source-backed finding makes the consequence clear: agree the release
+        scope before treating the work as complete. Open exact passages, check
+        counterevidence, then explore what a requirement change could affect.
+      </p>
+
+      <div className="h-24" />
     </PageShell>
   );
 }
