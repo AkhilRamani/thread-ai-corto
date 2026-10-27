@@ -5,6 +5,12 @@ A developer workspace that turns GitHub activity into a useful starting point an
 - **PR brief:** a short overview and suggested next step from your public pull requests and assigned issues, with source details and discussions available alongside it.
 - **Plan check:** compare one public repository with up to five selected Notion pages, inspect cited disagreements, and explore the impact of a proposed requirement change.
 
+## Try the hosted app
+
+[Open Thread](https://thread-ai-corto.vercel.app/) or [explore the sample workspace](https://thread-ai-corto.vercel.app/sample) without connecting accounts.
+
+Sign in with GitHub for your public PR brief. Plan check also requires connecting Notion and granting access to the pages you want to inspect. The sample uses illustrative and recorded output; live AI output requires connected sources.
+
 ## Try it locally
 
 Requires Node.js 22.13+ and pnpm 10.16.1.
@@ -37,6 +43,12 @@ Copy [`.env.example`](.env.example) to `.env.local` and configure the services y
 
 Source preview makes no AI call. Select **Generate my brief** or **Run plan check** to send the selected source text to OpenAI.
 
+### Deploy on Vercel
+
+Set the environment variables above for the Production environment, with `APP_URL=https://thread-ai-corto.vercel.app`. In the GitHub OAuth App, set the homepage to that origin and the authorization callback URL to `https://thread-ai-corto.vercel.app/api/auth/github/callback`. Use the client ID and secret from that same OAuth App. For Notion, register `https://thread-ai-corto.vercel.app/api/auth/notion/callback`.
+
+Redeploy after changing Vercel environment variables, then start a fresh sign-in from the production homepage. For a different deployment domain, update `APP_URL` and both registered callbacks together.
+
 ## Architecture and AI
 
 One Next.js application uses React, TypeScript, Tailwind and shadcn UI, with direct GitHub, Notion and OpenAI integrations. Provider tokens remain in encrypted HTTP-only cookies; there is no database. Selections and results live in page memory and survive tab switches, but not a page reload.
@@ -56,13 +68,19 @@ pnpm build
 
 Tests mock providers and the model SDK. A webpack build is also available with `pnpm exec next build --webpack` if Turbopack is restricted by the environment.
 
-The separate [AI evaluation](docs/evaluation.md) records eight synthetic scenario checks and reproduction instructions. It makes paid model calls and is not part of `pnpm test`. Local GitHub/Notion authorization, investigation and impact assessment were also verified with fictional demo data.
+The separate [AI evaluation](docs/evaluation.md) records eight synthetic scenario checks and reproduction instructions. It makes paid model calls and is not part of `pnpm test`. Local GitHub/Notion authorization, investigation and impact assessment were also verified with fictional demo data. GitHub sign-in has been verified on the Vercel deployment. The live AI and Notion flows have not yet been reverified in production.
 
 ## Limitations and next steps
 
 - GitHub access is public-only. Retrieval is capped; a check does not cover the entire backlog, repository or conversation history.
 - Valid citations identify inspected passages; they do not prove every model claim is correct. Findings are review aids, not release approval or evidence of passing tests.
 - Results are not persisted. Changing scope invalidates derived output; expired or revoked connections require reconnection.
-- Public deployment still needs HTTPS callbacks, hosting-level abuse limits, spending controls and sensitive-log redaction. This submission has been verified locally.
+- The hosted app is a take-home demo. Hosting-level abuse limits, spending controls and a review of sensitive-log redaction remain production-hardening work.
 
-Next improvements would be broader discussion coverage based on observed misses, evaluation on consented real projects, and user-controlled history if repeated checks justify persistence.
+### With more time
+
+| Additional time | Priority |
+| --------------- | -------- |
+| 1 day | Verify the complete deployed GitHub, Notion and AI flows; add request and spending limits and review sensitive logging. |
+| 5 days | Evaluate on consented real projects, expand regression scenarios and improve discussion coverage where observed misses justify it. |
+| 20 days | Add user-controlled saved investigations and history if repeated use justifies persistence, with explicit retention and deletion controls. |
